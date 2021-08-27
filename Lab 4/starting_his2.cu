@@ -1,12 +1,3 @@
-
-
-
-
-//o hist na paei sthn texture memory
-//cdf += paromoio paradeigma sto pdf
-
-
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,6 +20,7 @@ void free_pgm(PGM_IMG img);
 void write_pgm(PGM_IMG img, const char * path);
 PGM_IMG read_pgm(const char * path);
 
+// Prints out the error made while a CUDA kernel is running, if there is one
 void cudaCheckErrors() {
 	cudaError_t error = cudaGetLastError();
     if(error != cudaSuccess){
@@ -57,6 +49,7 @@ int main(int argc, char *argv[]){
 	return 0;
 }
 
+// Function that prints out the CUDA runtime of the grayscale image enhancement
 void run_gpu_gray_test(PGM_IMG img_in, char *out_filename)
 {
 	cudaEvent_t S,E;
@@ -140,12 +133,14 @@ void run_gpu_gray_test(PGM_IMG img_in, char *out_filename)
 	cudaDeviceReset();
 }
 
+// Main kernel which runs image enhancerment using histogram equalization
 __global__ void histogram_kernel(unsigned char * img_out, unsigned char * img_in, 
                             int * hist_in, int img_size, int nbr_bin, int min, int d) {
 	int pos = threadIdx.x + blockIdx.x*blockDim.x;
 	int cdf;
 	int i = -1;
 	__shared__ int lut[256];
+	
 	if (threadIdx.x < 256) {
 		do {
 			i++;
@@ -166,6 +161,7 @@ __global__ void histogram_kernel(unsigned char * img_out, unsigned char * img_in
 	}
 }
 
+// Run the CPU version of the Algorithm
 void run_cpu_gray_test(PGM_IMG img_in, char *out_filename)
 {
     PGM_IMG img_obuf;
@@ -177,7 +173,7 @@ void run_cpu_gray_test(PGM_IMG img_in, char *out_filename)
     free_pgm(img_obuf);
 }
 
-
+// Read the input image
 PGM_IMG read_pgm(const char * path){
     FILE * in_file;
     char sbuf[256];
@@ -207,6 +203,7 @@ PGM_IMG read_pgm(const char * path){
     return result;
 }
 
+// Write the new image created after the enehancement was implemented
 void write_pgm(PGM_IMG img, const char * path){
     FILE * out_file;
     out_file = fopen(path, "wb");
@@ -216,10 +213,12 @@ void write_pgm(PGM_IMG img, const char * path){
     fclose(out_file);
 }
 
+// Free memory of the struct that the image saved in
 void free_pgm(PGM_IMG img)
 {
     free(img.img);
 }
+
 
 void histogram(int * hist_out, unsigned char * img_in, int img_size, int nbr_bin){
     int i;
@@ -232,6 +231,7 @@ void histogram(int * hist_out, unsigned char * img_in, int img_size, int nbr_bin
     }
 }
 
+// Perform image sharpening with CPU
 void histogram_equalization(unsigned char * img_out, unsigned char * img_in, 
                             int * hist_in, int img_size, int nbr_bin){
     int *lut = (int *)malloc(sizeof(int)*nbr_bin);
@@ -266,6 +266,7 @@ void histogram_equalization(unsigned char * img_out, unsigned char * img_in,
         
     }
 }
+
 
 PGM_IMG contrast_enhancement_g(PGM_IMG img_in)
 {
