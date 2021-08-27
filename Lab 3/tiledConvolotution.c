@@ -107,6 +107,8 @@ __global__ void convolutionRowGPU(float *h_Dst, float *h_Src, float *h_Filter,
 		__syncthreads();
 	}
 }
+
+// GPU approach of the algorithm
 __global__ void convolutionColumnGPU(float *h_Dst, float *h_Src, float *h_Filter,
     			   int imageW, int imageH, int filterR) {
 	int k;
@@ -197,7 +199,9 @@ int main(int argc, char **argv) {
       return 0;
     }
 
-    // to 'h_Filter' apotelei to filtro me to opoio ginetai to convolution kai
+    // 'h_Filter' is the filter which is used in the convolution and contains random values
+    // 'h_Input' is the imput image
+	apotelei to filtro me to opoio ginetai to convolution kai
     // arxikopoieitai tuxaia. To 'h_Input' einai h eikona panw sthn opoia ginetai
     // to convolution kai arxikopoieitai kai auth tuxaia.
 
